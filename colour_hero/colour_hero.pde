@@ -69,10 +69,10 @@ void draw(){
   for(int i = 0 ; i < array_slice.size();i++){
      array_slice.get(i).paint_slice(); 
   }
-  check_press_result(); 
+  paint_result_images(); 
 }
 
-void check_press_result(){
+void paint_result_images(){
    //comprobación de la pulsación
   if(yes_semaphore){
     image(i_yes , x_control-200 , y_control-60);
