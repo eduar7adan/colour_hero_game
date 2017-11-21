@@ -36,12 +36,14 @@ class Cslice{
 
 
 
-int  colour_state , change_main_colour = 0 , life = 3 , level = 1 , wins=0 ,v=5;
+int  colour_state , change_main_colour = 0 , life = 3 , level = 1 , wins=0 ,v=5 , count_yes=0 , count_no=0;
 int x_control=375 , y_control = 400 ;
 ArrayList<Cslice> array_slice ; 
-PImage gameover , i_life1 , i_life2  , i_life3 ; 
+PImage gameover , i_life1 , i_life2  , i_life3, i_yes, i_no ; 
 
-SoundFile file , file_over;
+boolean yes_semaphore= false , no_semaphore = false ;
+
+SoundFile file , file_over , file_win , file_wrong;
 
 void setup(){
   
@@ -53,6 +55,8 @@ void setup(){
   i_life1 = loadImage ("life.png");
   i_life2 = loadImage ("life.png");
   i_life3 = loadImage ("life.png");
+  i_yes = loadImage ("yes.png");
+  i_no = loadImage ("error.png");
   
   file = new SoundFile(this, "musicgame.mp3");
   file.play();
@@ -82,7 +86,23 @@ void draw(){
   text("Level :", 40, 200);
   text(level ,120 ,200);
   
+  if(yes_semaphore){
+    image(i_yes , x_control-200 , y_control-60);
+    count_yes++;
+      if(count_yes == 20){
+        yes_semaphore = false ;
+        count_yes=0;
+      }
+  }
   
+  if(no_semaphore){
+    image(i_no , x_control-200 , y_control-60);
+    count_no++;
+      if(count_no == 20){
+        no_semaphore = false ;
+        count_no=0;
+      }
+  }
  delay(1);
   
 }
@@ -142,10 +162,17 @@ void keyPressed(){
   if(c_line == c_quad){
     change_main_colour= 1 ;  //permito que cambie el color del cuadrado principal
     print("yes");
+    file_win = new SoundFile(this , "win_music.mp3");
+    file_win.play();
+    yes_semaphore = true ;
+    
     wins++;  //para avanzar de nivel cuando haces 3 presiones correctas
   }else{
     life--;
     print("noooooo");
+    file_wrong = new SoundFile(this , "wrong_music.mp3");
+    file_wrong.play(1.5);
+    no_semaphore = true ;
     wins=0;
   }
   
