@@ -7,6 +7,8 @@ Colores activos :
   orange -> 3 
   white -> 4 
 */
+final int quads = 0 ;
+
 
 import processing.sound.*;
 
@@ -30,6 +32,9 @@ class Cslice{
     } 
   } 
 }
+//multivariables
+int round = 0 ;
+//variables de la round 1 
 
 int  colour_state, colour_next ,colour_next2 , change_main_colour = 0 , life = 3 , level = 1 ,score=0 , wins=0 ,v=4 , count_yes=0 , count_no=0;
 int x_control=375 , y_control = 400 ;
@@ -37,6 +42,8 @@ ArrayList<Cslice> array_slice ;
 PImage gameover , i_life1 , i_life2  , i_life3, i_yes, i_no ; 
 boolean yes_semaphore= false , no_semaphore = false ;
 SoundFile file , file_over , file_win , file_wrong;
+
+//variables de la round 2 
 
 void setup(){
   
@@ -59,17 +66,24 @@ void setup(){
 }
 
 void draw(){
-  background(0);
   
+  switch(round){
+    case quads :
+      round1_play();
+    break ;
+  }
+}
+
+void round1_play(){
+  background(0);
   score_and_level_text();
   stroke(204, 102, 0);
   line(x_control -200 , y_control ,x_control+ 200 , y_control);
-  colour_transition_main_quad();
-    
+  colour_transition_main_quad();  
   for(int i = 0 ; i < array_slice.size();i++){
      array_slice.get(i).paint_slice(); 
   }
-  paint_result_images(); 
+  paint_result_images();   
 }
 
 void paint_result_images(){
