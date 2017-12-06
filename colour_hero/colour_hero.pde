@@ -9,38 +9,48 @@ Colores activos :
 */
 final int quads = 0 ;
 final int quads_snake = 1 ;
+final int circles = 2 ;
 
 
 final int top_level_quads  = 1;
 final int initial_v = 4;
 import processing.sound.*;
-/*
+
 class Ccircle{
-   
-  int x , y , addone =0 , circle_colour;
+  
+  int circle_colour , circle_colour2;
+  float x  ,x2 , y , addone =0 , a , amp_c= 200;
   Ccircle(){
-   x = x_control ; 
-   y = sin(y_control) ; 
+   x = x_control ;    
+   x2= x_control ;
+   y = -100 ; 
    circle_colour = get_rand_colour() ;
+   circle_colour2 = get_rand_colour();
   }
   
   void paint_circle(){
    load_colour(circle_colour);
-   ellipse(x ,y ,100 ,100);
+   ellipse(x ,y ,110 ,110);
+   load_colour(circle_colour2);
+   ellipse(x2 ,y ,110 ,110);
+   x=x_control+amp_c*sin(a);
+   x2 =x_control-amp_c*sin(a);
+   a+=0.1;
    y+=v;
+   
    if((y > 20)&&(addone== 0)){
-     array_circle.add(new Ccircle());  //crea otro rectangulo
+     array_circle.add(new Ccircle());  
      addone= 1 ; 
     } 
   }
   
 }
-*/
+
 
 class Cslice{
  
   float x , y , addone = 0 ;
-  float a;
+  float a ;
   int slice_colour ;
   
   Cslice(){
@@ -75,9 +85,10 @@ int round = 0 ,amp = 120  ;
 
 //variables de la round 1 
 
-int  colour_state, colour_next ,colour_next2 , change_main_colour = 0 , life = 3 , level_quads = 1 ,score=0 , wins=0 ,v=initial_v , count_yes=0 , count_no=0;
+int  colour_state, colour_next ,colour_next2 , change_main_colour = 0 , life = 3 , level_quads = 1 ,score=0 , wins=0 ,v=initial_v , count_yes=0 , count_no=0 ,fps=20;
 int x_control=375 , y_control = 400 ;
 ArrayList<Cslice> array_slice ; 
+ArrayList<Ccircle> array_circle ;
 PImage gameover , i_life1 , i_life2  , i_life3, i_yes, i_no ; 
 boolean yes_semaphore= false , no_semaphore = false ;
 SoundFile music_round1 , music_over , music_win , music_wrong;
@@ -91,6 +102,7 @@ void setup(){
   background(0);
   array_slice = new ArrayList<Cslice>();
   array_slice.add(new Cslice());
+  array_circle = new ArrayList<Ccircle>();
   i_life1 = loadImage ("life.png");
   i_life2 = loadImage ("life.png");
   i_life3 = loadImage ("life.png");
@@ -98,7 +110,7 @@ void setup(){
   i_no = loadImage ("error.png");
   
   music_round1 = new SoundFile(this, "edudoso.mp3");
-  music_round1.play();
+  music_round1.loop();
   
   colour_state = get_rand_colour();
   colour_next = get_rand_colour();
@@ -107,7 +119,9 @@ void setup(){
 }
 
 void draw(){
-  
+  background(0);
+  colour_transition_main_quad();  
+  paint_result_images();  
   switch(round){
     case quads :
       round1_play();
@@ -117,11 +131,41 @@ void draw(){
         music_round1.stop();
         
       }
-    break ;
+      break ;
     
-      case quads_snake :
-        round2_play();
+    case quads_snake :
+      round2_play();
+      if(level_quads == 4){
+        round = circles ;
+        array_circle.add(new Ccircle());
+      }
+      break;
+      
+    case circles :
+     
+      round3_play();
+      break;
   }
+}
+
+void round3_play(){
+  
+ // background(0);
+ score_and_level_text();
+  v = 8;
+  frameRate(fps);//tramas por segundos
+  stroke(204, 102, 0);
+  line(0 , y_control-100 , x_control-200 , y_control-100);
+  noFill();
+  ellipse(x_control-200 , y_control-100 , 20,20);
+  stroke(0,255,255);
+  ellipse(x_control-200 ,y_control-100 ,2 ,2);
+  for(int i = 0 ; i < array_circle.size();i++){
+     array_circle.get(i).paint_circle(); 
+  }
+//  colour_transition_main_quad();  
+//  paint_result_images();   
+    
 }
 
 void round2_play(){
@@ -134,7 +178,7 @@ void restart_variables(){
   level_quads = 1 ; 
 }
 void round1_play(){
-  background(0);
+ // background(0);
   score_and_level_text();
   stroke(204, 102, 0);
   if(round == quads)
@@ -146,11 +190,12 @@ void round1_play(){
     stroke(0,255,255);
     ellipse(x_control-200 ,y_control ,2 ,2);
   }
-  colour_transition_main_quad();  
+ 
   for(int i = 0 ; i < array_slice.size();i++){
      array_slice.get(i).paint_slice(); 
   }
-  paint_result_images();   
+//  colour_transition_main_quad();  
+//  paint_result_images();   
 }
 
 void paint_result_images(){
@@ -245,6 +290,7 @@ void load_colour(int var){
 }
 
 void keyPressed(){
+  
    color c_line , c_quad;
    c_line = get(x_control, y_control);
    c_quad = get(720,220);
@@ -255,14 +301,18 @@ void keyPressed(){
    
     c_line = get(x_control, y_control);
     c_quad = get(720,220);
-    
-    
     break;
+    
     case quads_snake :
      c_line = get(x_control-200+2, y_control);
      c_quad = get(720,220);
-     
     break;
+    
+    case circles:
+     c_line = get(x_control-200+2, y_control-100);
+     c_quad = get(720,220);
+    
+    
   } 
     if(c_line == c_quad){
       change_main_colour= 1 ;  //permito que cambie el color del cuadrado principal
@@ -281,7 +331,7 @@ void keyPressed(){
     
     if(life == 0 ){
       fill(0);
-      rect(600 ,40 , 24 ,24);  //para borrar la ultima vida 
+      rect(700 ,40 , 24 ,24);  //para borrar la ultima vida 
       gameover = loadImage ("gameover.png");
       image(gameover , x_control-125 , y_control-300);
       music_round1.stop();
@@ -298,9 +348,8 @@ void keyPressed(){
       if(round == quads )
          v++;
       else if (round == quads_snake )
-         amp -=7;
-       
-       
+         amp -=7; 
+      else if (round == circles )
+         fps+=5;
     }
-  
 }
